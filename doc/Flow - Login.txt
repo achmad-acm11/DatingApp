@@ -1,0 +1,23 @@
+title Login
+actor User
+participant User Service
+database Database
+
+group#cyan User Login
+User->User Service: access
+note left of User Service:[POST] API api/login
+User Service->Database: [Select] tbl_users
+User Service<--Database: user selected
+alt#pink Unauthorized Error
+User Service<--Database: user not found
+User<--User Service: Login Failed
+end
+alt#pink Wrong Password
+User Service<--User Service: Passoword not match
+User<--User Service: Login Failed
+end
+User Service<--User Service: Password match
+User Service<--User Service: Generate Token
+User<--User Service: Access Token
+
+end

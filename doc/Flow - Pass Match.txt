@@ -1,0 +1,29 @@
+title Pass Match
+actor User
+participant User Service
+participant Match Queue Repo
+database Database
+
+group#cyan Pass Match
+User->User Service: access with request
+note left of User Service:[GET] API api/users/:userId/pass-match
+User Service->Database: [Select] tbl_users
+User Service<--Database: user selected
+alt#pink User Not Found
+User Service<--Database: user not found
+User<--User Service: User Not Found
+end
+User Service->Match Queue Repo: Check User's Match Queue
+Match Queue Repo->Database: [Select] tbl_match_queues
+alt#pink User's Match Queue Not Found
+Match Queue Repo<--Database: Not Found
+User Service<--Match Queue Repo: User's Match Queue not found
+User<--User Service: User Match not Found
+end
+Match Queue Repo<--Database: Found
+User Service<--Match Queue Repo: User's Match Queue
+Match Queue Repo->Database: [Update] state and pass count \ntbl_match_queues
+User Service<--Match Queue Repo: Next Match
+User<--User Service: Match Profile
+
+end

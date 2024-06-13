@@ -1,0 +1,18 @@
+title Sign Up
+actor User
+participant User Service
+database Database
+
+group#cyan User Sign Up
+User->User Service: access with request
+note left of User Service:[POST] API api/signup
+User Service->Database: [Select] tbl_users
+User Service<--Database: user selected
+alt#pink Conflict Error
+User Service<--Database: user found
+User<--User Service: User Conflict
+end
+User Service<--User Service: Generate Password
+User<--User Service: Success
+
+end

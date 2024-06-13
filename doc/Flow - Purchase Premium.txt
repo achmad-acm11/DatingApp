@@ -1,0 +1,51 @@
+title Purchase Premium
+actor User
+participant Order Service
+participant User Repo
+participant Package Repo
+database Database
+
+group#cyan Purchase Premium
+User->Order Service: access with request
+note left of Order Service:[POST] API api/orders
+
+Order Service->User Repo: Get User
+User Repo->Database: [Select] tbl_users
+alt#pink User Not Found
+User Repo<--Database: user not found
+Order Service<--User Repo: User Not Found
+User<--Order Service: User Not Found
+end
+User Repo<--Database: user selected
+Order Service<--User Repo: User Data
+
+
+Order Service->Package Repo: Get Package
+Package Repo->Database: [Select] tbl_packages
+alt#pink Package Not Found
+Package Repo<--Database: package not found
+Order Service<--Package Repo: Package Not Found
+User<--Order Service: Package Not Found
+end
+Package Repo<--Database: package selected
+Order Service<--Package Repo: Package Data
+
+alt#pink Order Insufficient
+Order Service<--Order Service: amount not match
+User<--Order Service: Order Insufficient
+end
+
+Order Service->Database: [Select] Check User's Order Package
+alt#pink User's Order Package Found
+Order Service<--Database: User's Order Package Found
+User<--Order Service: Package Already Purchased
+end
+Order Service<--Database: User's Order Package Not Found
+Order Service->Database: [Create] User's Order Package
+Order Service<--Database: Success
+Order Service->User Repo: Premium Update
+User Repo->Database: [Update] User Premium
+User Repo<--Database: Success
+User<--Order Service: Success Purchased
+
+end
