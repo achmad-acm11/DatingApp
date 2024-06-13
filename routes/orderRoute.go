@@ -2,6 +2,7 @@ package routes
 
 import (
 	"DatingApp/controllers"
+	"DatingApp/middlewares"
 	"DatingApp/repositories"
 	"DatingApp/services"
 	"github.com/gin-gonic/gin"
@@ -22,9 +23,9 @@ func OrderRoute(db *gorm.DB, validate *validator.Validate, router *gin.RouterGro
 	)
 	controller := controllers.NewOrderController(service)
 
-	router.GET("orders/:id", controller.GetDetailHandler)    // ✅
-	router.POST("orders", controller.CreateHandler)          // ✅
-	router.DELETE("orders/:id", controller.DeleteOneHandler) // ✅
+	router.GET("orders/:id", middlewares.JwtTokenHandler(), controller.GetDetailHandler)    // ✅
+	router.POST("orders", middlewares.JwtTokenHandler(), controller.CreateHandler)          // ✅
+	router.DELETE("orders/:id", middlewares.JwtTokenHandler(), controller.DeleteOneHandler) // ✅
 
 	return router
 }

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"DatingApp/controllers"
+	"DatingApp/middlewares"
 	"DatingApp/repositories"
 	"DatingApp/services"
 	"github.com/gin-gonic/gin"
@@ -11,22 +12,23 @@ import (
 
 func UserRoute(db *gorm.DB, validate *validator.Validate, router *gin.RouterGroup) *gin.RouterGroup {
 	repository := repositories.NewUserRepository()
-	repositoryFind := repositories.NewUserFindRepository(repository)
+	repositoryQueue := repositories.NewMatchQueueRepository(repository)
 	service := services.NewUserService(
 		db,
 		validate,
 		repository,
-		repositoryFind,
+		repositoryQueue,
 	)
 	controller := controllers.NewUserController(service)
 
-	router.GET("users", controller.GetAllHandler)                         // ✅
-	router.GET("users/:userId", controller.GetDetailHandler)              // ✅
-	router.GET("users/:userId/couple", controller.GetCoupleHandler)       // ✅
-	router.GET("users/:userId/like-couple", controller.LikeCoupleHandler) // ✅
-	router.GET("users/:userId/pass-couple", controller.PassCoupleHandler) // ✅
-	router.POST("signup", controller.SignUpHandler)                       // ✅
-	router.POST("login", controller.LoginHandler)                         // ✅
-	router.DELETE("users/:userId", controller.DeleteOneHandler)           // ✅
+	router.GET("users", middlewares.JwtTokenHandler(), controller.GetAllHandler)                     // ✅
+	router.GET("users/my-profile", middlewares.JwtTokenHandler(), controller.GetMyProfileHandler)    // ✅
+	router.GET("users/profile/:userId", middlewares.JwtTokenHandler(), controller.GetProfileHandler) // ✅
+	router.GET("users/matches", middlewares.JwtTokenHandler(), controller.GetMatchesHandler)         // ✅
+	router.GET("users/like-match", middlewares.JwtTokenHandler(), controller.LikeMatchHandler)       // ✅
+	router.GET("users/pass-match", middlewares.JwtTokenHandler(), controller.PassMatchHandler)       // ✅
+	router.POST("signup", controller.SignUpHandler)                                                  // ✅
+	router.POST("login", controller.LoginHandler)                                                    // ✅
+	router.DELETE("users/:userId", middlewares.JwtTokenHandler(), controller.DeleteOneHandler)       // ✅
 	return router
 }

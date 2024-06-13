@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type UserFind struct {
+type MatchQueue struct {
 	gorm.Model   `json:"-"`
 	Id           int            `gorm:"column:id;primaryKey;autoIncrement;type:int(11)" json:"id"`
 	UserId       int            `gorm:"column:user_id;type:int(11);not null" json:"user_id"`
@@ -19,6 +19,6 @@ type UserFind struct {
 	DeletedAt    gorm.DeletedAt `gorm:"column:deleted_at;type:timestamp null;default:null;->" json:"-"`
 }
 
-func (u UserFind) TableName() string {
-	return "user_finds"
+func (u MatchQueue) TableName() string {
+	return "match_queues"
 }

@@ -15,6 +15,7 @@ type User struct {
 	PhoneNumber string         `gorm:"column:phone_number;type:varchar(255);not null" json:"phone_number"`
 	Password    string         `gorm:"column:password;type:varchar(255);not null" json:"-"`
 	IsPremium   bool           `gorm:"column:is_premium;type:tinyint(1);default:0" json:"is_premium"`
+	Verified    bool           `gorm:"column:verified;type:tinyint(1);default:0" json:"verified"`
 	CreatedAt   time.Time      `gorm:"column:created_at;type:timestamp null;default:current_timestamp();->" json:"-"`
 	UpdatedAt   time.Time      `gorm:"column:updated_at;type:timestamp null;default:null on update current_timestamp();->" json:"-"`
 	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;type:timestamp null;default:null;->" json:"-"`

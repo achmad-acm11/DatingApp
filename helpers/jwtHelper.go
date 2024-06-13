@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -10,7 +9,7 @@ import (
 	"time"
 )
 
-func getSecretKey() string {
+func GetSecretKey() string {
 	if gin.Mode() != gin.TestMode {
 		if os.Getenv("APP_ENV") == "" {
 			errEnv := godotenv.Load(".env")
@@ -59,7 +58,7 @@ func GenerateToken(data map[string]interface{}) (string, error) {
 	data["nbf"] = timeData.Unix()
 	data["exp"] = timeData.Add(getExpired() * time.Hour).Unix()
 	claim = data
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claim).SignedString([]byte(getSecretKey()))
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claim).SignedString([]byte(GetSecretKey()))
 
 	if err != nil {
 		return token, err
@@ -78,8 +77,4 @@ func GetTokenInHeader(ctx *gin.Context) string {
 		}
 	}
 	return ""
-}
-
-func MapTokenAuthorizationHeader(token string) string {
-	return fmt.Sprintf("Bearer %s", token)
 }

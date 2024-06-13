@@ -25,6 +25,7 @@ type orderService struct {
 	repoUser    repositories.UserRepository
 	db          *gorm.DB
 	validate    *validator.Validate
+	stdLog      *helpers.StandartLog
 }
 
 func NewOrderService(db *gorm.DB, validate *validator.Validate, repo repositories.OrderRepository, repoPackage repositories.PackageRepository, repoUser repositories.UserRepository) orderService {
@@ -34,20 +35,30 @@ func NewOrderService(db *gorm.DB, validate *validator.Validate, repo repositorie
 		repoUser:    repoUser,
 		db:          db,
 		validate:    validate,
+		stdLog:      helpers.NewStandardLog(constants.Order, constants.Service),
 	}
 }
 
 func (o orderService) GetOneOrder(ctx *gin.Context, id int) entities.Order {
+	o.stdLog.NameFunc = "GetOneOrder"
+	o.stdLog.StartFunction(id)
+
 	tx := o.db.Begin()
 	defer helpers.CommitOrRollback(tx)
 
 	order := o.repo.GetOneById(ctx, tx, id)
 	o.checkOrderExistWithPanic(order)
 
+	o.stdLog.NameFunc = "GetOneOrder"
+	o.stdLog.EndFunction(order)
+
 	return order
 }
 
 func (o orderService) CreateOrder(ctx *gin.Context, request requests.CreateOrderRequest) entities.Order {
+	o.stdLog.NameFunc = "CreateOrder"
+	o.stdLog.StartFunction(request)
+
 	err := o.validate.Struct(request)
 	helpers.ErrorHandlerValidator(err)
 
@@ -76,15 +87,26 @@ func (o orderService) CreateOrder(ctx *gin.Context, request requests.CreateOrder
 		Amount:      productPackage.Amount,
 	})
 
-	if user.IsPremium == false {
+	if productPackage.Id == 1 && user.IsPremium == false {
 		user.IsPremium = true
 		o.repoUser.Update(ctx, tx, user)
 	}
+
+	if productPackage.Id == 2 && user.Verified == false {
+		user.Verified = true
+		o.repoUser.Update(ctx, tx, user)
+	}
+
+	o.stdLog.NameFunc = "CreateOrder"
+	o.stdLog.EndFunction(order)
 
 	return order
 }
 
 func (o orderService) DeleteOneOrder(ctx *gin.Context, id int) {
+	o.stdLog.NameFunc = "DeleteOneOrder"
+	o.stdLog.StartFunction(id)
+
 	tx := o.db.Begin()
 	defer helpers.CommitOrRollback(tx)
 
@@ -92,6 +114,9 @@ func (o orderService) DeleteOneOrder(ctx *gin.Context, id int) {
 	o.checkOrderExistWithPanic(order)
 
 	o.repo.DeleteOne(ctx, tx, order)
+
+	o.stdLog.NameFunc = "DeleteOneOrder"
+	o.stdLog.EndFunction(nil)
 }
 
 func (o orderService) checkOrderExistWithPanic(order entities.Order) {

@@ -43,14 +43,3 @@ func ErrorHandlerValidator(err error) {
 		panic(exceptions.NewValidationError(errors))
 	}
 }
-
-func GetMessageErrorValidator(err error) []string {
-	var messages []string
-	if err != nil {
-		for _, e := range err.(validator.ValidationErrors) {
-			msg := customMessage(strings.ToLower(e.Field()), e.Tag(), e.Param())
-			messages = append(messages, msg)
-		}
-	}
-	return messages
-}

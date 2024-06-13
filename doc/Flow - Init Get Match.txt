@@ -6,7 +6,7 @@ database Database
 
 group#cyan Init Get Match
 User->User Service: access with request
-note left of User Service:[GET] API api/users/:userId/match
+note left of User Service:[GET] API api/users/matches
 User Service->Database: [Select] tbl_users
 User Service<--Database: user selected
 alt#pink User Not Found

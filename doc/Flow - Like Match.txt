@@ -6,7 +6,7 @@ database Database
 
 group#cyan Like Match
 User->User Service: access with request
-note left of User Service:[GET] API api/users/:userId/like-match
+note left of User Service:[GET] API api/users/like-match
 User Service->Database: [Select] tbl_users
 User Service<--Database: user selected
 alt#pink User Not Found

@@ -2,10 +2,12 @@ package main
 
 import (
 	"DatingApp/configs"
+	constants "DatingApp/constansts"
 	"DatingApp/helpers"
 	"DatingApp/middlewares"
 	"DatingApp/migrations"
 	"DatingApp/routes"
+	"DatingApp/seeds"
 	"github.com/gin-gonic/gin"
 	validator2 "github.com/go-playground/validator/v10"
 	cors "github.com/itsjamie/gin-cors"
@@ -22,7 +24,9 @@ func main() {
 	app_port := os.Getenv("APP_PORT")
 	validator := validator2.New()
 	db := configs.ConfigDB()
+	constants.Logger = configs.ConfigLog()
 	migrations.DoMigration(db)
+	seeds.DoSeed(db)
 
 	router := gin.Default()
 	router.Use(middlewares.ErrorHandler())

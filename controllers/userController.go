@@ -44,40 +44,37 @@ func (c userController) LoginHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, helpers.APIResponse("Success login user", "success", http.StatusOK, tokenResponse))
 }
 
-func (c userController) GetDetailHandler(ctx *gin.Context) {
+func (c userController) GetMyProfileHandler(ctx *gin.Context) {
+	userResponse := c.service.GetMyUser(ctx)
+
+	ctx.JSON(http.StatusOK, helpers.APIResponse("Success get my user profile", "success", http.StatusOK, userResponse))
+}
+
+func (c userController) GetProfileHandler(ctx *gin.Context) {
 	userId, err := strconv.Atoi(ctx.Param("userId"))
 	helpers.ErrorHandler(err)
 
 	userResponse := c.service.GetOneUser(ctx, userId)
 
-	ctx.JSON(http.StatusOK, helpers.APIResponse("Success get user", "success", http.StatusOK, userResponse))
+	ctx.JSON(http.StatusOK, helpers.APIResponse("Success get user profile", "success", http.StatusOK, userResponse))
 }
 
-func (c userController) GetCoupleHandler(ctx *gin.Context) {
-	userId, err := strconv.Atoi(ctx.Param("userId"))
-	helpers.ErrorHandler(err)
+func (c userController) GetMatchesHandler(ctx *gin.Context) {
+	userResponse := c.service.GetAllMatch(ctx)
 
-	userResponse := c.service.GetCouple(ctx, userId)
-
-	ctx.JSON(http.StatusOK, helpers.APIResponse("Success get couple", "success", http.StatusOK, userResponse))
+	ctx.JSON(http.StatusOK, helpers.APIResponse("Success get matches", "success", http.StatusOK, userResponse))
 }
 
-func (c userController) LikeCoupleHandler(ctx *gin.Context) {
-	userId, err := strconv.Atoi(ctx.Param("userId"))
-	helpers.ErrorHandler(err)
+func (c userController) LikeMatchHandler(ctx *gin.Context) {
+	userResponse := c.service.LikeMatch(ctx)
 
-	userResponse := c.service.LikeCouple(ctx, userId)
-
-	ctx.JSON(http.StatusOK, helpers.APIResponse("Success like couple", "success", http.StatusOK, userResponse))
+	ctx.JSON(http.StatusOK, helpers.APIResponse("Success like match", "success", http.StatusOK, userResponse))
 }
 
-func (c userController) PassCoupleHandler(ctx *gin.Context) {
-	userId, err := strconv.Atoi(ctx.Param("userId"))
-	helpers.ErrorHandler(err)
+func (c userController) PassMatchHandler(ctx *gin.Context) {
+	userResponse := c.service.PassMatch(ctx)
 
-	userResponse := c.service.PassCouple(ctx, userId)
-
-	ctx.JSON(http.StatusOK, helpers.APIResponse("Success pass couple", "success", http.StatusOK, userResponse))
+	ctx.JSON(http.StatusOK, helpers.APIResponse("Success pass match", "success", http.StatusOK, userResponse))
 }
 
 func (c userController) DeleteOneHandler(ctx *gin.Context) {
@@ -91,20 +88,3 @@ func (c userController) DeleteOneHandler(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, helpers.APIResponse("Success delete user", "success", http.StatusOK, message))
 }
-
-//func (c userController) UpdateHandler(ctx *gin.Context) {
-//
-//	// Get Path Param
-//	userId, err := strconv.Atoi(ctx.Param("userId"))
-//	helper.ErrorHandlerValidator(err)
-//
-//	// Get Request Payload Body
-//	var reqUser userRequestsParam.UpdateUserRequest
-//	err = ctx.ShouldBindJSON(&reqUser)
-//	helper.ErrorHandler(err)
-//
-//	// User Service
-//	userResponse := c.service.UpdateUser(ctx, reqUser, userId)
-//
-//	ctx.JSON(http.StatusOK, helper.APIResponse("Success create user", "success", http.StatusOK, userResponse))
-//}

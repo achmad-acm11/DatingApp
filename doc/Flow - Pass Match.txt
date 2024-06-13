@@ -6,7 +6,7 @@ database Database
 
 group#cyan Pass Match
 User->User Service: access with request
-note left of User Service:[GET] API api/users/:userId/pass-match
+note left of User Service:[GET] API api/users/pass-match
 User Service->Database: [Select] tbl_users
 User Service<--Database: user selected
 alt#pink User Not Found
