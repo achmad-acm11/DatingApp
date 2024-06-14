@@ -4,6 +4,7 @@ import "github.com/sirupsen/logrus"
 
 const UserNotFound = "user not found"
 const UserMatchNotFound = "User Match not found"
+const UserMatchNoMore = "There are no more User Match available for now"
 const PaymentRequired = "You need to pay to access this content."
 const PackageNotFound = "Package not found"
 const OrderNotFound = "Order not found"

@@ -202,8 +202,18 @@ func (u userService) GetAllMatch(ctx *gin.Context) entities.User {
 
 	if user.IsPremium == false && matchQueue.CurrentState >= 10 {
 		panic(exceptions.NewPaymentRequiredError(errors.New(constants.PaymentRequired).Error()))
+	} else if user.IsPremium == true && matchQueue.CurrentState >= 10 && matchQueue.CurrentState%10 == 0 {
+		matchQueue = u.repoMatchQueue.AppendQueue(ctx, tx, matchQueue, user)
 	}
+
+	if (matchQueue.CurrentState-1)+1 >= len(matchQueue.UserQueue) {
+		panic(exceptions.NewNotFoundError(errors.New(constants.UserMatchNoMore).Error()))
+	}
+
 	userQueue := strings.Split(matchQueue.UserQueue, "|")
+	if (matchQueue.CurrentState-1)+1 >= len(userQueue) {
+		panic(exceptions.NewNotFoundError(errors.New(constants.UserMatchNotFound).Error()))
+	}
 	userIdMatch, _ := strconv.Atoi(userQueue[matchQueue.CurrentState-1])
 
 	userMatch := u.repo.GetOneById(ctx, tx, userIdMatch)
@@ -233,15 +243,23 @@ func (u userService) LikeMatch(ctx *gin.Context) entities.User {
 		panic(exceptions.NewNotFoundError(errors.New(constants.UserMatchNotFound).Error()))
 	}
 
+	matchQueue.LikeCount += 1
+	u.repoMatchQueue.Update(ctx, tx, matchQueue)
+
 	if user.IsPremium == false && matchQueue.CurrentState >= 10 {
 		panic(exceptions.NewPaymentRequiredError(errors.New(constants.PaymentRequired).Error()))
+	} else if user.IsPremium == true && matchQueue.CurrentState >= 10 && matchQueue.CurrentState%10 == 0 {
+		matchQueue = u.repoMatchQueue.AppendQueue(ctx, tx, matchQueue, user)
 	}
+
 	userQueue := strings.Split(matchQueue.UserQueue, "|")
+	if (matchQueue.CurrentState-1)+1 >= len(userQueue) {
+		panic(exceptions.NewNotFoundError(errors.New(constants.UserMatchNoMore).Error()))
+	}
 	userIdMatch, _ := strconv.Atoi(userQueue[(matchQueue.CurrentState-1)+1])
 
 	userMatch := u.repo.GetOneById(ctx, tx, userIdMatch)
 
-	matchQueue.LikeCount += 1
 	matchQueue.CurrentState += 1
 	u.repoMatchQueue.Update(ctx, tx, matchQueue)
 
@@ -269,16 +287,23 @@ func (u userService) PassMatch(ctx *gin.Context) entities.User {
 	if matchQueue.Id == 0 {
 		panic(exceptions.NewNotFoundError(errors.New(constants.UserMatchNotFound).Error()))
 	}
+	matchQueue.PassCount += 1
+	u.repoMatchQueue.Update(ctx, tx, matchQueue)
 
 	if user.IsPremium == false && matchQueue.CurrentState >= 10 {
 		panic(exceptions.NewPaymentRequiredError(errors.New(constants.PaymentRequired).Error()))
+	} else if user.IsPremium == true && matchQueue.CurrentState >= 10 && matchQueue.CurrentState%10 == 0 {
+		matchQueue = u.repoMatchQueue.AppendQueue(ctx, tx, matchQueue, user)
 	}
+
 	userQueue := strings.Split(matchQueue.UserQueue, "|")
+	if (matchQueue.CurrentState-1)+1 >= len(userQueue) {
+		panic(exceptions.NewNotFoundError(errors.New(constants.UserMatchNoMore).Error()))
+	}
 	userIdMatch, _ := strconv.Atoi(userQueue[(matchQueue.CurrentState-1)+1])
 
 	userMatch := u.repo.GetOneById(ctx, tx, userIdMatch)
 
-	matchQueue.PassCount += 1
 	matchQueue.CurrentState += 1
 	u.repoMatchQueue.Update(ctx, tx, matchQueue)
 

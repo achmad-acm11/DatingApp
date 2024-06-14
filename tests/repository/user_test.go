@@ -87,7 +87,20 @@ func TestGetAllTenMatchUser(t *testing.T) {
 
 		mock.ExpectQuery(regexp.QuoteMeta(tests.SelectAllTenMatchSQL)).WillReturnRows(users)
 
-		data := repo.GetAllTenMatch(ctx, db, 1, "male")
+		data := repo.GetAllTenMatch(ctx, db, 1, "male", []string{})
+
+		t.Logf("%+v", data)
+
+		assert.Len(t, data, 1)
+		assert.Nil(t, mock.ExpectationsWereMet())
+	})
+	t.Run("Success Test Not in userIds", func(t *testing.T) {
+		users := sqlmock.NewRows(tests.UserCols).
+			AddRow(uRow1...)
+
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE id != ? AND gender != ? AND id NOT IN (?) AND `users`.`deleted_at` IS NULL LIMIT 10")).WillReturnRows(users)
+
+		data := repo.GetAllTenMatch(ctx, db, 1, "male", []string{"1"})
 
 		t.Logf("%+v", data)
 

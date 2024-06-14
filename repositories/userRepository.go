@@ -5,11 +5,12 @@ import (
 	"DatingApp/helpers"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 type UserRepository interface {
 	GetAll(ctx *gin.Context, db *gorm.DB) []entities.User
-	GetAllTenMatch(ctx *gin.Context, db *gorm.DB, userId int, gender string) []entities.User
+	GetAllTenMatch(ctx *gin.Context, db *gorm.DB, userId int, gender string, userIds []string) []entities.User
 	GetOneById(ctx *gin.Context, db *gorm.DB, id int) entities.User
 	GetOneCouple(ctx *gin.Context, db *gorm.DB, userId int, gender string) entities.User
 	Create(ctx *gin.Context, db *gorm.DB, user entities.User) entities.User
@@ -61,10 +62,19 @@ func (u userRepository) GetOneCouple(ctx *gin.Context, db *gorm.DB, userId int, 
 	return user
 }
 
-func (u userRepository) GetAllTenMatch(ctx *gin.Context, db *gorm.DB, userId int, gender string) []entities.User {
+func (u userRepository) GetAllTenMatch(ctx *gin.Context, db *gorm.DB, userId int, gender string, userIds []string) []entities.User {
 	users := []entities.User{}
 
-	err := db.WithContext(ctx).Where("id != ?", userId).Where("gender != ?", gender).Limit(10).Find(&users).Error
+	tx := db.WithContext(ctx).Where("id != ?", userId).Where("gender != ?", gender)
+	if len(userIds) > 0 {
+		var userIdsInt []int
+		for _, val := range userIds {
+			userId, _ = strconv.Atoi(val)
+			userIdsInt = append(userIdsInt, userId)
+		}
+		tx = tx.Where("id NOT IN ?", userIdsInt)
+	}
+	err := tx.Limit(10).Find(&users).Error
 	helpers.ErrorHandler(err)
 
 	return users
